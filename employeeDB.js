@@ -1,17 +1,3 @@
-// let mysql=require("mysql");
-// let connData={
-//   host:"localhost",
-//   user:"root",
-//   password:"",
-//   database:"employeedb"
-// };
-
-// function getConnection(){
-//   return mysql.createConnection(connData);
-// };
-// module.exports.getConnection=getConnection;
-
-
 let express=require("express");
 let app=express();
 app.use(express.json());
@@ -73,5 +59,26 @@ app.post("/svr/employees",function(req,res,next){
       console.log(result);
       res.send(`$(result.rowCount) insertion successful`);
     client.end();
+  })
+});
+
+app.put("/svr/employees/:empCode",function(req,res,next){
+  console.log("Inside put of employee");
+  let empCode=req.params.empCode;  
+  let body=req.body;
+  let params=[
+    body.name,body.department,
+    body.designation,body.salary,body.gender,empCode
+   ];
+  const sql=`UPDATE employee SET name=$1,department=$2,designation=$3,salary=$4,gender=$5 WHERE empCode=$6`;
+   connection.query(sql,params,function(err,result){
+    if(err){
+      console.log(err);
+      res.status(404).send("Error in Updating data");
+    }
+    else if(result.affectedRows===0){
+      res.status(404).send("No update happened");
+    }
+    else res.send("Update success");
   })
 });
